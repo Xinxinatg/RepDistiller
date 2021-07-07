@@ -11,7 +11,6 @@ from PIL import Image
 mean = {
     'cifar100': (0.5071, 0.4867, 0.4408),
 }
-
 std = {
     'cifar100': (0.2675, 0.2565, 0.2761),
 }
@@ -36,7 +35,28 @@ def get_data_folder():
     return data_folder
 
 
-class CIFAR100Instance(datasets.CIFAR100):
+class CIFAR100BackCompat(datasets.CIFAR100):
+    """
+    CIFAR100Instance+Sample Dataset
+    """
+
+    @property
+    def train_labels(self):
+        return self.targets
+
+    @property
+    def test_labels(self):
+        return self.targets
+
+    @property
+    def train_data(self):
+        return self.data
+
+    @property
+    def test_data(self):
+        return self.data
+
+class CIFAR100Instance(CIFAR100BackCompat):
     """CIFAR100Instance Dataset.
     """
     def __getitem__(self, index):
@@ -106,7 +126,7 @@ def get_cifar100_dataloaders(batch_size=128, num_workers=8, is_instance=False):
         return train_loader, test_loader
 
 
-class CIFAR100InstanceSample(datasets.CIFAR100):
+class CIFAR100InstanceSample(CIFAR100BackCompat):
     """
     CIFAR100Instance+Sample Dataset
     """
@@ -225,3 +245,5 @@ def get_cifar100_dataloaders_sample(batch_size=128, num_workers=8, k=4096, mode=
                              num_workers=int(num_workers/2))
 
     return train_loader, test_loader, n_data
+
+
